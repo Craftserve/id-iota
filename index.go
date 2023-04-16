@@ -136,6 +136,5 @@ func (id *Id) Scan(src interface{}) error {
 }
 
 func (id Id) Value() (driver.Value, error) {
-
-	return id.String(), nil
+	return id.UInt64, nil
 }
