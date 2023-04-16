@@ -64,7 +64,7 @@ func (id *Id) UnmarshalBinary(data []byte) error {
 	return nil
 }
 
-func (id *Id) MarshalText() ([]byte, error) {
+func (id Id) MarshalText() ([]byte, error) {
 	bytes, err := id.MarshalBinary()
 
 	return []byte(base58.Encode(bytes)), err
