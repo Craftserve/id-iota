@@ -81,7 +81,7 @@ func (id *Id) UnmarshalText(data []byte) error {
 }
 
 func (id Id) MarshalJSON() ([]byte, error) {
-	return []byte(id.String()), nil
+	return []byte(fmt.Sprintf(`"%s"`, id.String())), nil
 }
 
 func (id *Id) UnmarshalJSON(data []byte) error {
@@ -113,12 +113,6 @@ func (id *Id) Scan(src interface{}) error {
 	switch src.(type) {
 	case nil:
 		return fmt.Errorf("Scan: unable to scan nil into Id-Iota Id")
-	case uint64:
-		// Sadly database/sql and gorp does not support uint64 even if mysql supports bigint unsigned
-		bytes := make([]byte, 8)
-		binary.BigEndian.PutUint64(bytes, src.(uint64))
-
-		return id.UnmarshalBinary(bytes)
 	case []byte:
 		if len := len(src.([]byte)); len != 11 {
 			return fmt.Errorf("Scan: unable to scan []byte of length %d into Id-Iota Id", len)
