@@ -114,6 +114,7 @@ func (id *Id) Scan(src interface{}) error {
 	case nil:
 		return fmt.Errorf("Scan: unable to scan nil into Id-Iota Id")
 	case uint64:
+		// Sadly database/sql and gorp does not support uint64 even if mysql supports bigint unsigned
 		bytes := make([]byte, 8)
 		binary.BigEndian.PutUint64(bytes, src.(uint64))
 
@@ -136,5 +137,5 @@ func (id *Id) Scan(src interface{}) error {
 }
 
 func (id Id) Value() (driver.Value, error) {
-	return id.UInt64, nil
+	return id.String, nil
 }
