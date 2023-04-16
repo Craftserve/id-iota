@@ -3,6 +3,7 @@ package idiota
 import (
 	"database/sql/driver"
 	"encoding/binary"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -77,6 +78,21 @@ func (id *Id) UnmarshalText(data []byte) error {
 	}
 
 	return id.UnmarshalBinary(bytes)
+}
+
+func (id Id) MarshalJSON() ([]byte, error) {
+	return []byte(id.String()), nil
+}
+
+func (id *Id) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+
+	d := []byte(s)
+
+	return id.UnmarshalText(d)
 }
 
 func (id Id) String() string {
