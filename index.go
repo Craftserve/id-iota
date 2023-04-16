@@ -119,7 +119,7 @@ func (id *Id) Scan(src interface{}) error {
 
 		return id.UnmarshalBinary(bytes)
 	case []byte:
-		if len := len(src.([]byte)); len != 8 {
+		if len := len(src.([]byte)); len != 11 {
 			return fmt.Errorf("Scan: unable to scan []byte of length %d into Id-Iota Id", len)
 		}
 
@@ -136,5 +136,6 @@ func (id *Id) Scan(src interface{}) error {
 }
 
 func (id Id) Value() (driver.Value, error) {
+
 	return id.String(), nil
 }
