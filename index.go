@@ -45,6 +45,20 @@ func NewId(inputTime *time.Time, inputRandom *uint32) (id Id) {
 	return id
 }
 
+// Not usual function so it does need to be part of the standard (because of case sensitivity we tend to use sometimes numbers)
+func FromUint64(input uint64) (id Id, err error) {
+	b := make([]byte, 8)
+
+	binary.BigEndian.PutUint64(b, input)
+
+	err = id.UnmarshalBinary(b)
+	if err != nil {
+		return id, err
+	}
+
+	return id, nil
+}
+
 func (id Id) MarshalBinary() (idBytes []byte, err error) {
 	idBytes = make([]byte, 8)
 
