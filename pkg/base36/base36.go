@@ -78,7 +78,7 @@ func Encode(value uint64) string {
 		}
 	}
 
-	return string(res[i:])
+	return strings.ToLower(string(res[i:]))
 }
 
 // Decode decodes a base36-encoded string.
@@ -129,7 +129,7 @@ func EncodeBytesAsBytes(b []byte) []byte {
 
 // EncodeBytes encodes a byte slice to base36 string.
 func EncodeBytes(b []byte) string {
-	return string(EncodeBytesAsBytes(b))
+	return strings.ToLower(string(EncodeBytesAsBytes(b)))
 }
 
 // DecodeToBytes decodes a base36 string to a byte slice, using alphabet.
