@@ -12,14 +12,14 @@ import (
 func TestNew(t *testing.T) {
 	id := idiota.NewId(nil, nil)
 
-	assert.Len(t, id.String(), 11)
+	assert.Len(t, id.String(), 13)
 }
 
 func TestNewWithTime(t *testing.T) {
 	yesterday := time.Now().AddDate(0, 0, -1).Round(time.Second)
 
 	id := idiota.NewId(&yesterday, nil)
-	assert.Len(t, id.String(), 11)
+	assert.Len(t, id.String(), 13)
 	assert.Equal(t, yesterday, id.Time())
 }
 
@@ -28,7 +28,7 @@ func TestNewWithRandom(t *testing.T) {
 	random := uint32(123456789)
 
 	id := idiota.NewId(nil, &random)
-	assert.Len(t, id.String(), 11)
+	assert.Len(t, id.String(), 13)
 
 	fullIdUint64 := id.UInt64()
 	randomPart := uint32(fullIdUint64)
@@ -42,7 +42,7 @@ func TestNewWithRandomAndTime(t *testing.T) {
 	random := uint32(123456789)
 
 	id := idiota.NewId(&yesterday, &random)
-	assert.Len(t, id.String(), 11)
+	assert.Len(t, id.String(), 13)
 
 	fullIdUint64 := id.UInt64()
 

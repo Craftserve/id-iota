@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
-	"strings"
 	"time"
 
 	"github.com/Craftserve/id-iota/pkg/base36"
@@ -66,11 +65,11 @@ func (id Id) MarshalBinary() (idBytes []byte, err error) {
 	binary.BigEndian.PutUint32(idBytes[0:4], id.ts)
 	binary.BigEndian.PutUint32(idBytes[4:8], id.rand)
 
-	return []byte(strings.ToLower(string(idBytes))), nil
+	return []byte(idBytes), nil
 }
 
 func (id *Id) UnmarshalBinary(data []byte) error {
-	data = []byte(strings.ToLower(string(data)))
+	data = []byte(data)
 
 	if len(data) != 8 {
 		return ErrInvalidByteLength
@@ -83,7 +82,7 @@ func (id *Id) UnmarshalBinary(data []byte) error {
 }
 
 func (id Id) MarshalText() ([]byte, error) {
-	return []byte(strings.ToLower(base36.Encode(uint64((uint64(id.ts) << 32) + uint64(id.rand))))), nil
+	return []byte(base36.Encode(uint64((uint64(id.ts) << 32) + uint64(id.rand)))), nil
 }
 
 func (id *Id) UnmarshalText(data []byte) error {
@@ -92,6 +91,10 @@ func (id *Id) UnmarshalText(data []byte) error {
 	}
 
 	bytes := base36.DecodeToBytes(string(data))
+
+	if len(bytes) != 8 {
+		return ErrInvalidByteLength
+	}
 
 	return id.UnmarshalBinary(bytes)
 }
@@ -106,13 +109,13 @@ func (id *Id) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	d := []byte(strings.ToLower(s))
+	d := []byte(s)
 
 	return id.UnmarshalText(d)
 }
 
 func (id Id) String() string {
-	return strings.ToLower(base36.Encode(uint64((uint64(id.ts) << 32) + uint64(id.rand))))
+	return base36.Encode(uint64((uint64(id.ts) << 32) + uint64(id.rand)))
 }
 
 func (id Id) UInt64() uint64 {
@@ -128,24 +131,37 @@ func (id *Id) Scan(src interface{}) error {
 	case nil:
 		return fmt.Errorf("Scan: unable to scan nil into Id-Iota Id")
 	case []byte:
-		if len := len(src.([]byte)); len > 13 {
+		if len := len(src.([]byte)); len > 8 {
 			return fmt.Errorf("Scan: unable to scan []byte of length %d into Id-Iota Id", len)
 		}
 
-		err := id.UnmarshalText(src.([]byte))
+		err := id.UnmarshalBinary(src.([]byte))
 		if err != nil {
 			return fmt.Errorf("Scan: unable to scan while unmarshalling []byte %s into Id-Iota Id", src)
 		}
+
 		return nil
 	case string:
 		if src == nil {
 			return nil
 		}
 
-		err := id.UnmarshalText(src.([]byte))
+		str := src.(string)
+
+		err := id.UnmarshalText([]byte(str))
 		if err != nil {
 			return fmt.Errorf("Scan: unable to scan while unmarshalling string %s into Id-Iota Id", src)
 		}
+		return nil
+
+	case uint64:
+		idUnt64, err := FromUint64(src.(uint64))
+		if err != nil {
+			return fmt.Errorf("Scan: unable to scan while unmarshalling uint64 %d into Id-Iota Id", src)
+		}
+
+		*id = idUnt64
+
 		return nil
 	default:
 		return fmt.Errorf("Scan: unable to scan type %T into Id-Iota Id", src)
