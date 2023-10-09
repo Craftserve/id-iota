@@ -66,7 +66,7 @@ func (id Id) MarshalBinary() (idBytes []byte, err error) {
 	binary.BigEndian.PutUint32(idBytes[0:4], id.ts)
 	binary.BigEndian.PutUint32(idBytes[4:8], id.rand)
 
-	return idBytes, nil
+	return []byte(strings.ToLower(string(idBytes))), nil
 }
 
 func (id *Id) UnmarshalBinary(data []byte) error {
@@ -104,7 +104,7 @@ func (id *Id) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	d := []byte(s)
+	d := []byte(strings.ToLower(s))
 
 	return id.UnmarshalText(d)
 }
