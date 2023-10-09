@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"strings"
 	"time"
 
 	"github.com/Craftserve/id-iota/pkg/base36"
@@ -80,7 +81,7 @@ func (id *Id) UnmarshalBinary(data []byte) error {
 }
 
 func (id Id) MarshalText() ([]byte, error) {
-	return []byte(base36.Encode(uint64((uint64(id.ts) << 32) + uint64(id.rand)))), nil
+	return []byte(strings.ToLower(base36.Encode(uint64((uint64(id.ts) << 32) + uint64(id.rand))))), nil
 }
 
 func (id *Id) UnmarshalText(data []byte) error {
@@ -109,7 +110,7 @@ func (id *Id) UnmarshalJSON(data []byte) error {
 }
 
 func (id Id) String() string {
-	return base36.Encode(uint64((uint64(id.ts) << 32) + uint64(id.rand)))
+	return strings.ToLower(base36.Encode(uint64((uint64(id.ts) << 32) + uint64(id.rand))))
 }
 
 func (id Id) UInt64() uint64 {
