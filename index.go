@@ -9,7 +9,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/akamensky/base58"
+	"github.com/Craftserve/id-iota/pkg/base36"
 )
 
 var ErrInvalidByteLength = errors.New("Invalid byte length")
@@ -80,16 +80,15 @@ func (id *Id) UnmarshalBinary(data []byte) error {
 }
 
 func (id Id) MarshalText() ([]byte, error) {
-	bytes, err := id.MarshalBinary()
-
-	return []byte(base58.Encode(bytes)), err
+	return []byte(base36.Encode(uint64((uint64(id.ts) << 32) + uint64(id.rand)))), nil
 }
 
 func (id *Id) UnmarshalText(data []byte) error {
-	bytes, err := base58.Decode(string(data))
-	if err != nil {
-		return err
+	if len(data) > 13 {
+		return ErrInvalidByteLength
 	}
+
+	bytes := base36.DecodeToBytes(string(data))
 
 	return id.UnmarshalBinary(bytes)
 }
@@ -110,9 +109,7 @@ func (id *Id) UnmarshalJSON(data []byte) error {
 }
 
 func (id Id) String() string {
-	bytes, _ := id.MarshalBinary()
-
-	return base58.Encode(bytes)
+	return base36.Encode(uint64((uint64(id.ts) << 32) + uint64(id.rand)))
 }
 
 func (id Id) UInt64() uint64 {
@@ -128,7 +125,7 @@ func (id *Id) Scan(src interface{}) error {
 	case nil:
 		return fmt.Errorf("Scan: unable to scan nil into Id-Iota Id")
 	case []byte:
-		if len := len(src.([]byte)); len != 11 {
+		if len := len(src.([]byte)); len > 13 {
 			return fmt.Errorf("Scan: unable to scan []byte of length %d into Id-Iota Id", len)
 		}
 
