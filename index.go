@@ -135,7 +135,7 @@ func (id *Id) Scan(src interface{}) error {
 	case nil:
 		return fmt.Errorf("Scan: unable to scan nil into Id-Iota Id")
 	case []byte:
-		if len := len(src.([]byte)); len > 8 {
+		if len := len(src.([]byte)); len > 13 {
 			return fmt.Errorf("Scan: unable to scan []byte of length %d into Id-Iota Id", len)
 		}
 
