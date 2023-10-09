@@ -86,6 +86,9 @@ func Decode(s string) uint64 {
 	if len(s) > 13 {
 		s = s[:12]
 	}
+
+	s = strings.ToLower(s)
+
 	res := uint64(0)
 	l := len(s) - 1
 	for idx := 0; idx < len(s); idx++ {
@@ -100,6 +103,7 @@ var bigZero = big.NewInt(0)
 
 // EncodeBytesAsBytes encodes a byte slice to base36.
 func EncodeBytesAsBytes(b []byte) []byte {
+
 	x := new(big.Int)
 	x.SetBytes(b)
 
