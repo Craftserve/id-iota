@@ -70,6 +70,8 @@ func (id Id) MarshalBinary() (idBytes []byte, err error) {
 }
 
 func (id *Id) UnmarshalBinary(data []byte) error {
+	data = []byte(strings.ToLower(string(data)))
+
 	if len(data) != 8 {
 		return ErrInvalidByteLength
 	}
