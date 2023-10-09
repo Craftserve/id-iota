@@ -139,7 +139,7 @@ func (id *Id) Scan(src interface{}) error {
 			return fmt.Errorf("Scan: unable to scan []byte of length %d into Id-Iota Id", len)
 		}
 
-		err := id.UnmarshalBinary(src.([]byte))
+		err := id.UnmarshalText(src.([]byte))
 		if err != nil {
 			return fmt.Errorf("Scan: unable to scan while unmarshalling []byte %s into Id-Iota Id", src)
 		}
