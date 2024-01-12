@@ -12,6 +12,7 @@ import (
 	"github.com/Craftserve/id-iota/pkg/base36"
 )
 
+var ErrInvalidStringLength = errors.New("Invalid string length")
 var ErrInvalidByteLength = errors.New("Invalid byte length")
 
 type Id struct {
@@ -89,13 +90,13 @@ func (id Id) MarshalText() ([]byte, error) {
 
 func (id *Id) UnmarshalText(data []byte) error {
 	if len(data) > 13 {
-		return ErrInvalidByteLength
+		return fmt.Errorf(`%w (got %d)`, ErrInvalidStringLength, len(data))
 	}
 
 	bytes := base36.DecodeToBytes(string(data))
 
 	if len(bytes) != 8 {
-		return ErrInvalidByteLength
+		return fmt.Errorf(`%w (got %d)`, ErrInvalidByteLength, len(bytes))
 	}
 
 	return id.UnmarshalBinary(bytes)
