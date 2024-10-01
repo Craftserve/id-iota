@@ -96,7 +96,7 @@ func (id *Id) UnmarshalText(data []byte) error {
 
 	bytes := base36.DecodeToBytes(string(data))
 
-	if len(bytes) < 8 {
+	if len(bytes) > 8 {
 		return fmt.Errorf(`%w (got %d)`, ErrInvalidByteLength, len(bytes))
 	}
 
