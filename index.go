@@ -72,9 +72,9 @@ func (id Id) MarshalBinary() (idBytes []byte, err error) {
 func (id *Id) UnmarshalBinary(data []byte) error {
 	data = []byte(data)
 
-	// Check if the data is 8 bytes long
-	if len(data) != 8 {
-		return fmt.Errorf(`%w (got %d)`, ErrInvalidByteLength, len(data))
+	if len(data) < 8 {
+		padding := make([]byte, 8-len(data))
+		data = append(data, padding...)
 	}
 
 	id.ts = binary.BigEndian.Uint32(data[0:4])
@@ -96,7 +96,7 @@ func (id *Id) UnmarshalText(data []byte) error {
 
 	bytes := base36.DecodeToBytes(string(data))
 
-	if len(bytes) != 8 {
+	if len(bytes) < 8 {
 		return fmt.Errorf(`%w (got %d)`, ErrInvalidByteLength, len(bytes))
 	}
 
