@@ -142,13 +142,9 @@ func (id *Id) Scan(src interface{}) error {
 		return fmt.Errorf("Scan: unable to scan nil into Id-Iota Id")
 
 	case []byte:
-		if len := len(src.([]byte)); len > 13 {
-			return fmt.Errorf("Scan: unable to scan []byte of length %d into Id-Iota Id", len)
-		}
-
-		err := id.UnmarshalText(src.([]byte))
+		err := id.UnmarshalText(v)
 		if err != nil {
-			return fmt.Errorf("Scan: unable to scan while unmarshalling []byte %s into Id-Iota Id", src)
+			return fmt.Errorf("Scan: unable to scan while unmarshalling []byte %q into Id-Iota Id: %w", v, err)
 		}
 
 		return nil
