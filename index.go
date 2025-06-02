@@ -142,14 +142,16 @@ func (id *Id) Scan(src interface{}) error {
 		return fmt.Errorf("Scan: unable to scan nil into Id-Iota Id")
 
 	case []byte:
-		if len(v) == 8 {
-			// Treat as binary (from MarshalBinary)
-			return id.UnmarshalBinary(v)
-		} else if len(v) <= 13 {
-			// Treat as base36 string
-			return id.UnmarshalText(v)
+		if len := len(src.([]byte)); len > 13 {
+			return fmt.Errorf("Scan: unable to scan []byte of length %d into Id-Iota Id", len)
 		}
-		return fmt.Errorf("Scan: unable to scan []byte of length %d into Id-Iota Id", len(v))
+
+		err := id.UnmarshalText(src.([]byte))
+		if err != nil {
+			return fmt.Errorf("Scan: unable to scan while unmarshalling []byte %s into Id-Iota Id", src)
+		}
+
+		return nil
 
 	case string:
 		if len(v) > 13 {

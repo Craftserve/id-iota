@@ -107,11 +107,10 @@ func TestScanString(t *testing.T) {
 	var id2 idiota.Id
 	err := id2.Scan(id.String())
 	assert.NoError(t, err)
-
 	assert.Equal(t, id, id2)
 
-	// bytes
-	idBytes, err := id.MarshalBinary()
+	// bytes (text-based)
+	idBytes, err := id.MarshalText()
 	assert.NoError(t, err)
 
 	err = id2.Scan(idBytes)
