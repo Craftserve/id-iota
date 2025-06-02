@@ -99,12 +99,6 @@ func TestUnmarshalBinary(t *testing.T) {
 	assert.Equal(t, id, id2)
 }
 
-func TestUnmarshalBinaryWrongLength(t *testing.T) {
-	var id2 idiota.Id
-	err := id2.UnmarshalBinary([]byte{0, 0, 0})
-	assert.Error(t, err)
-}
-
 func TestScanString(t *testing.T) {
 
 	// string
@@ -158,5 +152,56 @@ func TestScanInvalidType(t *testing.T) {
 func TestScanByteWithWrongLength(t *testing.T) {
 	var id idiota.Id
 	err := id.Scan([]byte{0, 0, 0})
+	assert.Error(t, err)
+}
+
+func TestFromUint64(t *testing.T) {
+	original := idiota.NewId(nil, nil)
+	u := original.UInt64()
+
+	id2, err := idiota.FromUint64(u)
+	assert.NoError(t, err)
+	assert.Equal(t, original, id2)
+}
+
+func TestMarshalUnmarshalJSON(t *testing.T) {
+	original := idiota.NewId(nil, nil)
+
+	data, err := original.MarshalJSON()
+	assert.NoError(t, err)
+
+	var id2 idiota.Id
+	err = id2.UnmarshalJSON(data)
+	assert.NoError(t, err)
+
+	assert.Equal(t, original, id2)
+}
+
+func TestValue(t *testing.T) {
+	id := idiota.NewId(nil, nil)
+
+	val, err := id.Value()
+	assert.NoError(t, err)
+
+	strVal, ok := val.(string)
+	assert.True(t, ok)
+	assert.Equal(t, id.String(), strVal)
+}
+
+func TestUnmarshalText_Invalid(t *testing.T) {
+	var id idiota.Id
+
+	// Too long
+	err := id.UnmarshalText([]byte("toolongbase36string"))
+	assert.Error(t, err)
+
+	// Non-base36 encoding
+	err = id.UnmarshalText([]byte("!@#$%^&*()"))
+	assert.Error(t, err)
+}
+
+func TestUnmarshalBinary_TooLong(t *testing.T) {
+	var id idiota.Id
+	err := id.UnmarshalBinary([]byte{1, 2, 3, 4, 5, 6, 7, 8, 9})
 	assert.Error(t, err)
 }
