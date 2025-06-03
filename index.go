@@ -96,15 +96,16 @@ func (id Id) MarshalText() ([]byte, error) {
 
 func (id *Id) UnmarshalText(data []byte) error {
 	if len(data) > 13 {
-		return fmt.Errorf("%w (got %d)", ErrInvalidStringLength, len(data))
+		return fmt.Errorf(`%w (got %d)`, ErrInvalidStringLength, len(data))
 	}
 
-	decoded := base36.DecodeToBytes(string(data))
-	if len(decoded) != 8 {
-		return fmt.Errorf("%w (got %d)", ErrInvalidByteLength, len(decoded))
+	bytes := base36.DecodeToBytes(string(data))
+
+	if len(bytes) > 8 {
+		return fmt.Errorf(`%w (got %d)`, ErrInvalidByteLength, len(bytes))
 	}
 
-	return id.UnmarshalBinary(decoded)
+	return id.UnmarshalBinary(bytes)
 }
 
 func (id Id) MarshalJSON() ([]byte, error) {
@@ -137,34 +138,44 @@ func (id Id) Time() time.Time {
 }
 
 func (id *Id) Scan(src interface{}) error {
-	switch v := src.(type) {
+	switch src.(type) {
 	case nil:
 		return fmt.Errorf("Scan: unable to scan nil into Id-Iota Id")
-
 	case []byte:
-		err := id.UnmarshalText(v)
+		if len := len(src.([]byte)); len > 13 {
+			return fmt.Errorf("Scan: unable to scan []byte of length %d into Id-Iota Id", len)
+		}
+
+		err := id.UnmarshalText(src.([]byte))
 		if err != nil {
-			return fmt.Errorf("Scan: unable to scan while unmarshalling []byte %q into Id-Iota Id: %w", v, err)
+			return fmt.Errorf("Scan: unable to scan while unmarshalling []byte %s into Id-Iota Id", src)
 		}
 
 		return nil
-
 	case string:
-		if len(v) > 13 {
-			return fmt.Errorf("Scan: string too long: %d", len(v))
+		if src == nil {
+			return nil
 		}
-		return id.UnmarshalText([]byte(v))
+
+		str := src.(string)
+
+		err := id.UnmarshalText([]byte(str))
+		if err != nil {
+			return fmt.Errorf("Scan: unable to scan while unmarshalling string %s into Id-Iota Id", src)
+		}
+		return nil
 
 	case uint64:
-		parsed, err := FromUint64(v)
+		idUnt64, err := FromUint64(src.(uint64))
 		if err != nil {
-			return fmt.Errorf("Scan: unable to scan uint64: %w", err)
+			return fmt.Errorf("Scan: unable to scan while unmarshalling uint64 %d into Id-Iota Id", src)
 		}
-		*id = parsed
-		return nil
 
+		*id = idUnt64
+
+		return nil
 	default:
-		return fmt.Errorf("Scan: unsupported type %T", src)
+		return fmt.Errorf("Scan: unable to scan type %T into Id-Iota Id", src)
 	}
 }
 

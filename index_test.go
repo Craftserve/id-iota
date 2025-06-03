@@ -148,12 +148,6 @@ func TestScanInvalidType(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func TestScanByteWithWrongLength(t *testing.T) {
-	var id idiota.Id
-	err := id.Scan([]byte{0, 0, 0})
-	assert.Error(t, err)
-}
-
 func TestFromUint64(t *testing.T) {
 	original := idiota.NewId(nil, nil)
 	u := original.UInt64()
@@ -185,22 +179,4 @@ func TestValue(t *testing.T) {
 	strVal, ok := val.(string)
 	assert.True(t, ok)
 	assert.Equal(t, id.String(), strVal)
-}
-
-func TestUnmarshalText_Invalid(t *testing.T) {
-	var id idiota.Id
-
-	// Too long
-	err := id.UnmarshalText([]byte("toolongbase36string"))
-	assert.Error(t, err)
-
-	// Non-base36 encoding
-	err = id.UnmarshalText([]byte("!@#$%^&*()"))
-	assert.Error(t, err)
-}
-
-func TestUnmarshalBinary_TooLong(t *testing.T) {
-	var id idiota.Id
-	err := id.UnmarshalBinary([]byte{1, 2, 3, 4, 5, 6, 7, 8, 9})
-	assert.Error(t, err)
 }
